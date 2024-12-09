@@ -25,5 +25,7 @@ game.find_nash() -> will return pure nash equilibrium strategy profiles (if foun
 
 check any game properties with:
 game.subgames
+
 game.strategic_game
+
 game.{property... etc.}
