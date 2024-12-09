@@ -57,7 +57,10 @@ class Game:
         self.weighted_game_types = {}
         self.strategic_game = []
 
-    def build_subgames(self):
+    def build_subgames(self, subgames: list[pd.DataFrame] = []) -> None:
+        if subgames: 
+            self.subgames = subgames
+            return
         for game in range(self.num_subgames):
             subgame  = pd.DataFrame(index=self.A1, columns=self.A2)
             for action1 in self.A1:
@@ -67,7 +70,10 @@ class Game:
                     subgame.loc[action1, action2] = (p1, p2)
             self.subgames.append(subgame)
 
-    def set_game_weights(self):
+    def set_game_weights(self, game_weights: list[Fraction] = []) -> None:
+        if game_weights:
+            self.game_weights = game_weights
+            return
         for game in range(self.num_subgames):
             num = int(input(f'enter numerator for game {game}'))
             den = int(input(f'enter denominator for game {game}'))
@@ -83,7 +89,10 @@ class Game:
                     weighted_subgame.loc[action1, action2] = (p1, p2)
             self.weighted_payoffs.append(weighted_subgame)        
 
-    def set_weighted_types(self):
+    def set_weighted_types(self, weighted_types: dict[tuple[int, int], pd.DataFrame] = {}) -> None:
+        if weighted_types:
+            self.weighted_game_types = weighted_types
+            return
         for count, game in enumerate(self.weighted_payoffs):
             t1 = int(input(f'enter p1 type for game {count}'))
             t2 = int(input(f'enter p2 type for game {count}'))
@@ -161,5 +170,29 @@ class Game:
 
 
 # Quick Init for testing:
-# game = Game(4, ("T", "B"), ("L", "R"), 2, 2)
+if "__name__" == "__main__":
+    game = Game(4, ("T", "B"), ("L", "R"), 2, 2)
+
+    subgames = [] 
+    for g in range(game.num_subgames):
+            subgame  = pd.DataFrame(index=game.A1, columns=game.A2)
+            for action1 in game.A1:
+                for action2 in game.A2:
+                    payoff = (np.random.randint(1, 10), np.random.randint(1, 10))
+                    subgame.loc[action1, action2] = payoff
+            subgames.append(subgame)
+    game.build_subgames(subgames=subgames)
+
+    game.set_game_weights([Fraction(1, 3), Fraction(1, 6), Fraction(1, 4), Fraction(1, 4)])
+    
+    game.get_weighted_payoffs()
+    
+    weighted_types = {(1, 1): subgames[0], (1, 2): subgames[1], (2, 1): subgames[2], (2, 2): subgames[3]}
+    game.set_weighted_types(weighted_types=weighted_types)
+
+    game.build_strategic_form()
+
+    game.subgames
+    game.strategic_game
+    game.find_nash()
 
