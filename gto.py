@@ -110,6 +110,10 @@ class Game:
                 self.weighted_game_types.update({(t1, t2): weighted_sum})
 
     def build_strategic_form(self):
+        """
+        Constructs the strategic form of the game by aggregating the weighted payoffs
+        for each strategy profile of both players.
+        """
         strategic_game = pd.DataFrame(index=self.strategies1, columns=self.strategies2)
         for strat1 in self.strategies1:
             for strat2 in self.strategies2:
@@ -122,7 +126,7 @@ class Game:
                     p1 += self.weighted_game_types[key].loc[strat1[prof1 - 1], strat2[prof2 - 1]][0]
                     p2 += self.weighted_game_types[key].loc[strat1[prof1 - 1], strat2[prof2 - 1]][1]
 
-                strategic_game.to_numpy()[self.strategies1.index(strat1)][self.strategies2.index(strat2)] = (p1, p2)    
+                strategic_game.at[strat1, strat2] = (p1, p2)    
         self.strategic_game = strategic_game
 
     def find_nash(self) -> list[object]:
@@ -134,20 +138,19 @@ class Game:
                 for indx2 in max_pay1[indx1]:
                     if indx2 == i:
                         strat1 = self.strategies1[indx2]
-                        strat2 = self.strategies2[i]
+                        strat2 = self.strategies2[indx1]
                         nash_equilibriums.append((strat1, strat2))
         return nash_equilibriums
 
     def get_p1_max_payoffs(self):
         max_pay1 = []
         for a in self.strategic_game.to_numpy().T:
-            mx = -99999
+            mx = float('-inf')
             inner = []
             for i, b in enumerate(a):
                 if b[0] > mx:
-                    inner = []
+                    inner = [i]
                     mx = b[0]
-                    inner.append(i)
                 elif b[0] == mx:
                     inner.append(i)
             max_pay1.append(inner)
@@ -156,13 +159,12 @@ class Game:
     def get_p2_max_payoffs(self):
         max_pay2 = []
         for a in self.strategic_game.to_numpy():
-            mx = -99999
+            mx = float('-inf')
             inner = []
             for i, b in enumerate(a):
                 if b[1] > mx:
-                    inner = []
+                    inner = [i]
                     mx = b[1]
-                    inner.append(i)
                 elif b[1] == mx:
                     inner.append(i)
             max_pay2.append(inner)
@@ -170,7 +172,7 @@ class Game:
 
 
 # Quick Init for testing:
-if "__name__" == "__main__":
+if __name__ == "__main__":
     game = Game(4, ("T", "B"), ("L", "R"), 2, 2)
 
     subgames = [] 
@@ -178,7 +180,7 @@ if "__name__" == "__main__":
             subgame  = pd.DataFrame(index=game.A1, columns=game.A2)
             for action1 in game.A1:
                 for action2 in game.A2:
-                    payoff = (np.random.randint(1, 10), np.random.randint(1, 10))
+                    payoff = (np.random.randint(-10, 10), np.random.randint(1, 10))
                     subgame.loc[action1, action2] = payoff
             subgames.append(subgame)
     game.build_subgames(subgames=subgames)
