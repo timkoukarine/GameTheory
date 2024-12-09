@@ -24,6 +24,7 @@ game.build_strategic_form() - No Input Needed
 game.find_nash() -> will return pure nash equilibrium strategy profiles (if found)
 
 check any game properties with:
+
 game.subgames
 
 game.strategic_game
