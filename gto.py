@@ -57,7 +57,7 @@ class Game:
         self.weighted_game_types = {}
         self.strategic_game = []
 
-    def build_subgames(self, subgames: list[pd.DataFrame] = []) -> None:
+    def build_subgames(self, subgames: list[pd.DataFrame] | None = None) -> None:
         if subgames: 
             self.subgames = subgames
             return
@@ -70,7 +70,7 @@ class Game:
                     subgame.loc[action1, action2] = (p1, p2)
             self.subgames.append(subgame)
 
-    def set_game_weights(self, game_weights: list[Fraction] = []) -> None:
+    def set_game_weights(self, game_weights: list[Fraction] | None = None) -> None:
         if game_weights:
             self.game_weights = game_weights
             return
@@ -89,7 +89,7 @@ class Game:
                     weighted_subgame.loc[action1, action2] = (p1, p2)
             self.weighted_payoffs.append(weighted_subgame)        
 
-    def set_weighted_types(self, weighted_types: dict[tuple[int, int], pd.DataFrame] = {}) -> None:
+    def set_weighted_types(self, weighted_types: dict[tuple[int, int], pd.DataFrame] | None = None) -> None:
         if weighted_types:
             self.weighted_game_types = weighted_types
             return
@@ -193,8 +193,4 @@ if __name__ == "__main__":
     game.set_weighted_types(weighted_types=weighted_types)
 
     game.build_strategic_form()
-
-    game.subgames
-    game.strategic_game
-    game.find_nash()
 
